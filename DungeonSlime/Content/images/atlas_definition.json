@@ -1,0 +1,19 @@
+{
+    "texture": "images/atlas",
+    "regions": [
+        {
+            "name": "slime",
+            "x": 0,
+            "y": 0,
+            "width": 20,
+            "height": 20
+        },
+        {
+            "name": "bat",
+            "x": 20,
+            "y": 0,
+            "width": 20,
+            "height": 20
+        }
+    ]
+}
