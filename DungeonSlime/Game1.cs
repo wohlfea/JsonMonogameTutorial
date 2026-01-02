@@ -8,8 +8,8 @@ namespace DungeonSlime;
 
 public class Game1 : Core
 {
-    private Sprite _slime;
-    private Sprite _bat;
+    private AnimatedSprite _slime;
+    private AnimatedSprite _bat;
 
     public Game1() : base("DungeonSlime", 1280, 720, false)
     {
@@ -26,11 +26,11 @@ public class Game1 : Core
 
         TextureAtlas atlas = TextureAtlas.FromFile(Content, "images/atlas_definition.json");
         // retrieve the slime region from the atlas.
-        _slime = atlas.CreateSprite("slime");
+        _slime = atlas.CreateAnimatedSprite("slime-animation");
         _slime.Scale = Vector2.One * 4.0f;
 
         // retrieve the bat region from the atlas.
-        _bat = atlas.CreateSprite("bat");
+        _bat = atlas.CreateAnimatedSprite("bat-animation");
         _bat.Scale = Vector2.One * 4.0f;
     }
 
@@ -40,7 +40,9 @@ public class Game1 : Core
         {
             Exit();
         }
-        // TODO: Add your update logic here
+
+        _slime.Update(gameTime);
+        _bat.Update(gameTime);
 
         base.Update(gameTime);
     }
