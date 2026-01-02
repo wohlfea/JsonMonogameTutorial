@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoGameLibrary", "MonoGameLibrary\MonoGameLibrary.csproj", "{BA92A64C-2272-4382-AD52-6494E4EA4702}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DungeonSlime", "DungeonSlime\DungeonSlime.csproj", "{506F16C6-EFC8-40D1-937A-D4FA09FD8079}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA92A64C-2272-4382-AD52-6494E4EA4702}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BA92A64C-2272-4382-AD52-6494E4EA4702}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BA92A64C-2272-4382-AD52-6494E4EA4702}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BA92A64C-2272-4382-AD52-6494E4EA4702}.Release|Any CPU.Build.0 = Release|Any CPU
+		{506F16C6-EFC8-40D1-937A-D4FA09FD8079}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{506F16C6-EFC8-40D1-937A-D4FA09FD8079}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{506F16C6-EFC8-40D1-937A-D4FA09FD8079}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{506F16C6-EFC8-40D1-937A-D4FA09FD8079}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
