@@ -27,6 +27,8 @@ public class Game1 : Core
     private SoundEffect _bounceSoundEffect;
     private SoundEffect _collectSoundEffect;
 
+    private Song _themeSong;
+
     private const float MOVEMENT_SPEED = 5.0f;
 
     public Game1() : base("DungeonSlime", 1280, 720, false)
@@ -53,6 +55,8 @@ public class Game1 : Core
 
         _batPosition = new Vector2(_slime.Width + 10, 0);
         AssignRandomBatVelocity();
+
+        Audio.PlaySong(_themeSong);
     }
 
     private void AssignRandomBatVelocity()
@@ -85,20 +89,10 @@ public class Game1 : Core
         _tilemap = Tilemap.FromFile(Content, "images/tilemap_definition.json");
         _tilemap.Scale = Vector2.One * 4.0f;
 
-        // sounds
+        // sound & music
         _bounceSoundEffect = Content.Load<SoundEffect>("audio/bounce");
         _collectSoundEffect = Content.Load<SoundEffect>("audio/collect");
-        Song theme = Content.Load<Song>("audio/theme");
-
-        if (MediaPlayer.State == MediaState.Playing)
-        {
-            MediaPlayer.Stop();
-        }
-
-        MediaPlayer.Play(theme);
-        MediaPlayer.IsRepeating = true;
-
-
+        _themeSong = Content.Load<Song>("audio/theme");
     }
 
     protected override void Update(GameTime gameTime)
@@ -195,7 +189,7 @@ public class Game1 : Core
             normal.Normalize();
             _batVelocity = Vector2.Reflect(_batVelocity, normal);
 
-            _bounceSoundEffect.Play();
+            Audio.PlaySoundEffect(_bounceSoundEffect);
         }
 
         _batPosition = newBatPosition;
@@ -210,7 +204,7 @@ public class Game1 : Core
             // the column and row multiplied by the width and height.
             _batPosition = new Vector2(column * _bat.Width, row * _bat.Height);
 
-            _collectSoundEffect.Play();
+            Audio.PlaySoundEffect(_collectSoundEffect);
 
             // Assign a new random velocity to the bat
             AssignRandomBatVelocity();
@@ -250,6 +244,26 @@ public class Game1 : Core
         if (Input.Keyboard.IsKeyDown(Keys.D) || Input.Keyboard.IsKeyDown(Keys.Right))
         {
             _slimePosition.X += speed;
+        }
+
+        // If the M key is pressed, toggle mute state for audio.
+        if (Input.Keyboard.WasKeyJustPressed(Keys.M))
+        {
+            Audio.ToggleMute();
+        }
+
+        // If the + button is pressed, increase the volume.
+        if (Input.Keyboard.WasKeyJustPressed(Keys.OemPlus))
+        {
+            Audio.SongVolume += 0.1f;
+            Audio.SoundEffectVolume += 0.1f;
+        }
+
+        // If the - button was pressed, decrease the volume.
+        if (Input.Keyboard.WasKeyJustPressed(Keys.OemMinus))
+        {
+            Audio.SongVolume -= 0.1f;
+            Audio.SoundEffectVolume -= 0.1f;
         }
     }
 
