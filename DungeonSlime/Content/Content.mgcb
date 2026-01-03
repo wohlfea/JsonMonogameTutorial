@@ -13,11 +13,26 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin audio/bounce.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:audio/bounce.wav
+
+#begin audio/collect.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:audio/collect.wav
+
+#begin audio/theme.ogg
+/importer:OggImporter
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:audio/theme.ogg
+
 #begin images/atlas_definition.json
 /copy:images/atlas_definition.json
-
-#begin images/tilemap_definition.json
-/copy:images/tilemap_definition.json
 
 #begin images/atlas.png
 /importer:TextureImporter
@@ -42,4 +57,7 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:images/logo.png
+
+#begin images/tilemap_definition.json
+/copy:images/tilemap_definition.json
 

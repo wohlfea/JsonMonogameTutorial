@@ -1,7 +1,9 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using MonoGameLibrary;
 using MonoGameLibrary.Graphics;
 using MonoGameLibrary.Input;
@@ -13,11 +15,17 @@ public class Game1 : Core
 {
     private AnimatedSprite _slime;
     private AnimatedSprite _bat;
+
     private Vector2 _slimePosition;
     private Vector2 _batPosition;
+
     private Vector2 _batVelocity;
+
     private Tilemap _tilemap;
     private Rectangle _roomBounds;
+
+    private SoundEffect _bounceSoundEffect;
+    private SoundEffect _collectSoundEffect;
 
     private const float MOVEMENT_SPEED = 5.0f;
 
@@ -76,6 +84,21 @@ public class Game1 : Core
         // create Tilemap
         _tilemap = Tilemap.FromFile(Content, "images/tilemap_definition.json");
         _tilemap.Scale = Vector2.One * 4.0f;
+
+        // sounds
+        _bounceSoundEffect = Content.Load<SoundEffect>("audio/bounce");
+        _collectSoundEffect = Content.Load<SoundEffect>("audio/collect");
+        Song theme = Content.Load<Song>("audio/theme");
+
+        if (MediaPlayer.State == MediaState.Playing)
+        {
+            MediaPlayer.Stop();
+        }
+
+        MediaPlayer.Play(theme);
+        MediaPlayer.IsRepeating = true;
+
+
     }
 
     protected override void Update(GameTime gameTime)
@@ -171,6 +194,8 @@ public class Game1 : Core
         {
             normal.Normalize();
             _batVelocity = Vector2.Reflect(_batVelocity, normal);
+
+            _bounceSoundEffect.Play();
         }
 
         _batPosition = newBatPosition;
@@ -184,6 +209,8 @@ public class Game1 : Core
             // Change the bat position by setting the x and y values equal to
             // the column and row multiplied by the width and height.
             _batPosition = new Vector2(column * _bat.Width, row * _bat.Height);
+
+            _collectSoundEffect.Play();
 
             // Assign a new random velocity to the bat
             AssignRandomBatVelocity();
