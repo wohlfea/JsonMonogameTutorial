@@ -241,7 +241,7 @@ public class TextureAtlas
         public List<TextureAnimationJson> Animations { get; set; }
     }
 
-    public sealed class TextureRegionJson
+    private sealed class TextureRegionJson
     {
         public string Name { get; set; }
         public int X { get; set; }

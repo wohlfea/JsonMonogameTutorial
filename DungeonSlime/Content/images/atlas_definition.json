@@ -1,71 +1,29 @@
 {
     "texture": "images/atlas",
     "regions": [
-        {
-            "name": "slime-1",
-            "x": 0,
-            "y": 0,
-            "width": 20,
-            "height": 20
-        },
-        {
-            "name": "slime-2",
-            "x": 0,
-            "y": 20,
-            "width": 20,
-            "height": 20
-        },
-        {
-            "name": "bat-1",
-            "x": 20,
-            "y": 20,
-            "width": 20,
-            "height": 20
-        },
-        {
-            "name": "bat-2",
-            "x": 20,
-            "y": 0,
-            "width": 20,
-            "height": 20
-        },
-        {
-            "name": "bat-3",
-            "x": 40,
-            "y": 0,
-            "width": 20,
-            "height": 20
-        }
+        { "name": "slime-1", "x": 0, "y": 0, "width": 20, "height": 20 },
+        { "name": "slime-2", "x": 0, "y": 20, "width": 20, "height": 20 },
+        { "name": "bat-1", "x": 20, "y": 20, "width": 20, "height": 20 },
+        { "name": "bat-2", "x": 20, "y": 0, "width": 20, "height": 20 },
+        { "name": "bat-3", "x": 40, "y": 0, "width": 20, "height": 20 }
     ],
     "animations": [
         {
             "name": "slime-animation",
             "delay": 200,
             "frames": [
-                {
-                    "region": "slime-1"
-                },
-                {
-                    "region": "slime-2"
-                }
+                { "region": "slime-1" },
+                { "region": "slime-2" }
             ]
         },
         {
             "name": "bat-animation",
             "delay": 150,
             "frames": [
-                {
-                    "region": "bat-1"
-                },
-                {
-                    "region": "bat-2"
-                },
-                {
-                    "region": "bat-3"
-                },
-                {
-                    "region": "bat-2"
-                }
+                { "region": "bat-1" },
+                { "region": "bat-2" },
+                { "region": "bat-3" },
+                { "region": "bat-2" }
             ]
         }
     ]
