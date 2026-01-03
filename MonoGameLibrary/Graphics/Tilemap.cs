@@ -125,7 +125,7 @@ public class Tilemap
     }
 
     /// <summary>
-    /// Creates a new tilemap based on a tilemap xml configuration file.
+    /// Creates a new tilemap based on a tilemap json configuration file.
     /// </summary>
     /// <param name="content">The content manager used to load the texture for the tileset.</param>
     /// <param name="filename">The path to the json file, relative to the content root directory.</param>
