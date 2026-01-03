@@ -16,6 +16,9 @@
 #begin images/atlas_definition.json
 /copy:images/atlas_definition.json
 
+#begin images/tilemap_definition.json
+/copy:images/tilemap_definition.json
+
 #begin images/atlas.png
 /importer:TextureImporter
 /processor:TextureProcessor
