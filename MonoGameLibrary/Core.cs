@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGameLibrary.Input;
+using MonoGameLibrary.Audio;
 
 namespace MonoGameLibrary;
 
@@ -45,6 +46,11 @@ public class Core : Game
     /// Gets or Sets a value that indicates if the game should exit when the esc key on the keyboard is pressed.
     /// </summary>
     public static bool ExitOnEscape { get; set; }
+
+    /// <summary>
+    /// Gets a reference to the audio controller system.
+    /// </summary>
+    public static AudioController Audio { get; private set; }
 
     /// <summary>
     /// Creates a new Core instance.
@@ -103,11 +109,20 @@ public class Core : Game
         SpriteBatch = new SpriteBatch(GraphicsDevice);
 
         Input = new InputManager();
+
+        Audio = new AudioController();
+    }
+
+    protected override void UnloadContent()
+    {
+        Audio.Dispose();
+        base.UnloadContent();
     }
 
     protected override void Update(GameTime gameTime)
     {
         Input.Update(gameTime);
+        Audio.Update();
 
         if (ExitOnEscape && Input.Keyboard.IsKeyDown(Keys.Escape))
         {
