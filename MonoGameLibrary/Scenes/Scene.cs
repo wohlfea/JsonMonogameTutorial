@@ -102,5 +102,6 @@ public abstract class Scene : IDisposable
         }
         IsDisposed = true;
     }
+
 }
 
