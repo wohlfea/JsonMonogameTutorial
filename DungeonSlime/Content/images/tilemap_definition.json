@@ -3,8 +3,8 @@
         "contentPath": "images/atlas",
         "region": {
             "name": "dungeon-01",
-            "x": 0,
-            "y": 40,
+            "x": 260,
+            "y": 0,
             "width": 80,
             "height": 80
         },
