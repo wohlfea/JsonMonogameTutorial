@@ -3,6 +3,7 @@ using Gum.DataTypes;
 using Gum.DataTypes.Variables;
 using Gum.Managers;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 using Gum.Forms.Controls;
 using MonoGameGum.GueDeriving;
 using MonoGameLibrary.Graphics;
@@ -220,6 +221,24 @@ public class OptionsSlider : Slider
         Visual.RollOn += HandleRollOn;
         ValueChanged += HandleValueChanged;
         ValueChangedByUi += HandleValueChangedByUi;
+        KeyDown += HandleKeyDown;
+    }
+
+    /// <summary>
+    /// Handles A and D keys for slider value adjustment (in addition to built-in Left/Right arrow support)
+    /// </summary>
+    private void HandleKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Keys.A)
+        {
+            // A key decreases the value (same as Left arrow)
+            Value = Math.Max(Minimum, Value - SmallChange);
+        }
+        else if (e.Key == Keys.D)
+        {
+            // D key increases the value (same as Right arrow)
+            Value = Math.Min(Maximum, Value + SmallChange);
+        }
     }
 
     /// <summary>
