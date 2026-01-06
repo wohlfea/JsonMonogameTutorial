@@ -141,12 +141,12 @@ internal class AnimatedButton : Button
     /// </summary>
     private void HandleKeyDown(object sender, KeyEventArgs e)
     {
-        if (e.Key == Keys.Left)
+        if (e.Key == Keys.Left || e.Key == Keys.A)
         {
             // Left arrow navigates to previous control
             HandleTab(TabDirection.Up, loop: true);
         }
-        if (e.Key == Keys.Right)
+        if (e.Key == Keys.Right || e.Key == Keys.D)
         {
             // Right arrow navigates to next control
             HandleTab(TabDirection.Down, loop: true);

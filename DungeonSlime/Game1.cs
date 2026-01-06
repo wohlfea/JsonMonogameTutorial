@@ -52,11 +52,15 @@ public class Game1 : Core
         // Up arrow key is pushed.
         FrameworkElement.TabReverseKeyCombos.Add(
            new KeyCombo() { PushedKey = Microsoft.Xna.Framework.Input.Keys.Up });
+        FrameworkElement.TabReverseKeyCombos.Add(
+           new KeyCombo() { PushedKey = Microsoft.Xna.Framework.Input.Keys.W });
 
         // Customize the tab UI navigation to also trigger when the keyboard
         // Down arrow key is pushed.
         FrameworkElement.TabKeyCombos.Add(
            new KeyCombo() { PushedKey = Microsoft.Xna.Framework.Input.Keys.Down });
+        FrameworkElement.TabKeyCombos.Add(
+           new KeyCombo() { PushedKey = Microsoft.Xna.Framework.Input.Keys.S });
 
         // The assets created for the UI were done so at 1/4th the size to keep the size of the
         // texture atlas small.  So we will set the default canvas size to be 1/4th the size of
