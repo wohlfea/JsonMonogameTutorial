@@ -224,19 +224,16 @@ public class OptionsSlider : Slider
         KeyDown += HandleKeyDown;
     }
 
-    /// <summary>
-    /// Handles A and D keys for slider value adjustment (in addition to built-in Left/Right arrow support)
-    /// </summary>
     private void HandleKeyDown(object sender, KeyEventArgs e)
     {
         if (e.Key == Keys.A)
         {
-            // A key decreases the value (same as Left arrow)
+            // A key decreases the value (same as Left arrow)                                                                                                
             Value = Math.Max(Minimum, Value - SmallChange);
         }
         else if (e.Key == Keys.D)
         {
-            // D key increases the value (same as Right arrow)
+            // D key increases the value (same as Right arrow)                                                                                               
             Value = Math.Min(Maximum, Value + SmallChange);
         }
     }

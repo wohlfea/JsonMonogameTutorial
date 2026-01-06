@@ -48,6 +48,7 @@ public class Game1 : Core
         // Register gamepad input for Ui control.
         FrameworkElement.GamePadsForUiControl.AddRange(GumService.Default.Gamepads);
 
+
         // Customize the tab reverse UI navigation to also trigger when the keyboard
         // Up arrow key is pushed.
         FrameworkElement.TabReverseKeyCombos.Add(
