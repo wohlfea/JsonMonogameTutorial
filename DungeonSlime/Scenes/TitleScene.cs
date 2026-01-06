@@ -18,7 +18,6 @@ public class TitleScene : Scene
 {
     private const string DUNGEON_TEXT = "Dungeon";
     private const string SLIME_TEXT = "Slime";
-    private const string PRESS_ENTER_TEXT = "Press Enter To Start";
 
     // The font to use to render normal text.
     private SpriteFont _font;
@@ -37,12 +36,6 @@ public class TitleScene : Scene
 
     // The origin to set for the slime text.
     private Vector2 _slimeTextOrigin;
-
-    // The position to draw the press enter text at.
-    private Vector2 _pressEnterPos;
-
-    // The origin to set for the press enter text when drawing it.
-    private Vector2 _pressEnterOrigin;
 
     // The texture used for the background pattern.
     private Texture2D _backgroundPattern;
@@ -90,11 +83,6 @@ public class TitleScene : Scene
         size = _font5x.MeasureString(SLIME_TEXT);
         _slimeTextPos = new Vector2(757, 207);
         _slimeTextOrigin = size * 0.5f;
-
-        // Set the position and origin for the press enter text.
-        size = _font.MeasureString(PRESS_ENTER_TEXT);
-        _pressEnterPos = new Vector2(640, 620);
-        _pressEnterOrigin = size * 0.5f;
 
         // Initialize the offset of the background pattern at zero.
         _backgroundOffsetOne = Vector2.Zero;
@@ -176,11 +164,15 @@ public class TitleScene : Scene
         // A UI interaction occurred, play the sound effect
         Core.Audio.PlaySoundEffect(_uiSoundEffect);
 
-        // Set the title panel to be invisible.
-        _titleScreenButtonsPanel.IsVisible = false;
+        // Remove the title panel from the root to completely take it out of
+        // focus navigation and input handling.
+        _titleScreenButtonsPanel.RemoveFromRoot();
 
-        // Set the options panel to be visible.
+        // Add the options panel to the root and make it visible.
+        _optionsPanel.AddToRoot();
         _optionsPanel.IsVisible = true;
+
+        _titleScreenButtonsPanel.IsVisible = false;
 
         // Give the back button on the options panel focus.
         _optionsBackButton.IsFocused = true;
@@ -191,8 +183,7 @@ public class TitleScene : Scene
     {
         _optionsPanel = new Panel();
         _optionsPanel.Dock(Gum.Wireframe.Dock.Fill);
-        _optionsPanel.IsVisible = false;
-        _optionsPanel.AddToRoot();
+        // Don't add to root yet - we'll add it when the options menu is opened
 
         TextRuntime optionsText = new TextRuntime();
         optionsText.X = 10;
@@ -283,11 +274,13 @@ public class TitleScene : Scene
         // A UI interaction occurred, play the sound effect
         Core.Audio.PlaySoundEffect(_uiSoundEffect);
 
-        // Set the title panel to be visible.
-        _titleScreenButtonsPanel.IsVisible = true;
+        // Remove the options panel from the root to completely take it out of
+        // focus navigation and input handling.
+        _optionsPanel.RemoveFromRoot();
 
-        // Set the options panel to be invisible.
-        _optionsPanel.IsVisible = false;
+        // Add the title panel back to the root and make it visible.
+        _titleScreenButtonsPanel.AddToRoot();
+        _titleScreenButtonsPanel.IsVisible = true;
 
         // Give the options button on the title panel focus since we are coming
         // back from the options screen.
