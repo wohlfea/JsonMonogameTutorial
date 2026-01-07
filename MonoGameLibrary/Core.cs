@@ -14,6 +14,10 @@ public class Core : Game
 {
     internal static Core s_instance;
 
+    // Stores the virtual resolution dimensions passed to the constructor
+    private int _virtualWidth;
+    private int _virtualHeight;
+
     /// <summary>
     /// Gets a reference to the Core instance.
     /// </summary>
@@ -41,24 +45,9 @@ public class Core : Game
     public static SpriteBatch SpriteBatch { get; private set; }
 
     /// <summary>
-    /// Gets the render target used for virtual resolution rendering.
+    /// Gets the resolution manager for virtual resolution rendering.
     /// </summary>
-    private static RenderTarget2D s_renderTarget;
-
-    /// <summary>
-    /// Gets the virtual resolution width.
-    /// </summary>
-    private static int s_virtualWidth;
-
-    /// <summary>
-    /// Gets the virtual resolution height.
-    /// </summary>
-    private static int s_virtualHeight;
-
-    /// <summary>
-    /// Gets the destination rectangle for drawing the render target to screen.
-    /// </summary>
-    private static Rectangle s_destinationRectangle;
+    public static Graphics.Resolution Resolution { get; private set; }
 
     /// <summary>
     /// Gets the content manager used to load global assets.
@@ -98,9 +87,9 @@ public class Core : Game
         // Store reference to engine for global member access.
         s_instance = this;
 
-        // Store virtual resolution
-        s_virtualWidth = width;
-        s_virtualHeight = height;
+        // Store virtual resolution for later use
+        _virtualWidth = width;
+        _virtualHeight = height;
 
         // Create a new graphics device manager.
         Graphics = new GraphicsDeviceManager(this);
@@ -145,17 +134,14 @@ public class Core : Game
         // graphics device.
         GraphicsDevice = base.GraphicsDevice;
 
-        // Create the render target at virtual resolution
-        s_renderTarget = new RenderTarget2D(GraphicsDevice, s_virtualWidth, s_virtualHeight);
+        // Create the sprite batch instance.
+        SpriteBatch = new SpriteBatch(GraphicsDevice);
 
-        // Calculate destination rectangle for scaling with aspect ratio
-        CalculateDestinationRectangle();
+        // Initialize the resolution manager with the virtual resolution
+        Resolution = new Graphics.Resolution(GraphicsDevice, _virtualWidth, _virtualHeight);
 
         // Subscribe to window size changes
         Window.ClientSizeChanged += OnClientSizeChanged;
-
-        // Create the sprite batch instance.
-        SpriteBatch = new SpriteBatch(GraphicsDevice);
 
         // Create a new input manager.
         Input = new InputManager();
@@ -166,25 +152,7 @@ public class Core : Game
 
     private void OnClientSizeChanged(object sender, EventArgs e)
     {
-        CalculateDestinationRectangle();
-    }
-
-    private static void CalculateDestinationRectangle()
-    {
-        float targetAspectRatio = (float)s_virtualWidth / s_virtualHeight;
-        int width = GraphicsDevice.PresentationParameters.BackBufferWidth;
-        int height = (int)(width / targetAspectRatio);
-
-        if (height > GraphicsDevice.PresentationParameters.BackBufferHeight)
-        {
-            height = GraphicsDevice.PresentationParameters.BackBufferHeight;
-            width = (int)(height * targetAspectRatio);
-        }
-
-        int x = (GraphicsDevice.PresentationParameters.BackBufferWidth - width) / 2;
-        int y = (GraphicsDevice.PresentationParameters.BackBufferHeight - height) / 2;
-
-        s_destinationRectangle = new Rectangle(x, y, width, height);
+        Resolution.CalculateDestinationRectangle();
     }
 
     protected override void UnloadContent()
@@ -226,9 +194,8 @@ public class Core : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        // Set render target to draw to virtual resolution
-        GraphicsDevice.SetRenderTarget(s_renderTarget);
-        GraphicsDevice.Clear(Color.Black);
+        // Begin rendering to the virtual resolution render target
+        Resolution.BeginDraw();
 
         // If there is an active scene, draw it to the render target
         if (s_activeScene != null)
@@ -236,13 +203,8 @@ public class Core : Game
             s_activeScene.Draw(gameTime);
         }
 
-        // Now draw the render target to the back buffer, scaled
-        GraphicsDevice.SetRenderTarget(null);
-        GraphicsDevice.Clear(Color.Black);
-
-        SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
-        SpriteBatch.Draw(s_renderTarget, s_destinationRectangle, Color.White);
-        SpriteBatch.End();
+        // End rendering and draw the scaled result to the screen
+        Resolution.EndDraw(SpriteBatch);
 
         base.Draw(gameTime);
     }

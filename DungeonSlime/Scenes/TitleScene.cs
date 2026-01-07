@@ -89,8 +89,8 @@ public class TitleScene : Scene
         _backgroundOffsetTwo = new Vector2(_backgroundPattern.Width * 0.75f, _backgroundPattern.Height * 0.75f);
 
         // Set the background pattern destination rectangle to fill the entire
-        // virtual resolution (1280x720).
-        _backgroundDestination = new Rectangle(0, 0, 1280, 720);
+        // virtual resolution.
+        _backgroundDestination = new Rectangle(0, 0, Core.Resolution.VirtualWidth, Core.Resolution.VirtualHeight);
 
         InitializeUI();
     }

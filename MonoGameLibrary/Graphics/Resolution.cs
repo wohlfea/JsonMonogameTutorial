@@ -1,186 +1,91 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace MonoGameLibrary.Graphics;
 
-public static class Resolution
+/// <summary>
+/// Manages virtual resolution rendering using a RenderTarget2D.
+/// Renders the game at a fixed virtual resolution, then scales it to fit the actual screen.
+/// </summary>
+public class Resolution
 {
-    static private GraphicsDeviceManager _Device = null;
+    private readonly GraphicsDevice _graphicsDevice;
+    private RenderTarget2D _renderTarget;
+    private Rectangle _destinationRectangle;
 
-    static private int _Width = 800;
-    static private int _Height = 600;
-    static private int _VWidth = 1024;
-    static private int _VHeight = 768;
-    static private Matrix _ScaleMatrix;
-    static private bool _FullScreen = false;
-    static private bool _dirtyMatrix = true;
+    /// <summary>
+    /// Gets the virtual resolution width.
+    /// </summary>
+    public int VirtualWidth { get; private set; }
 
-    static public void Init(GraphicsDeviceManager device)
+    /// <summary>
+    /// Gets the virtual resolution height.
+    /// </summary>
+    public int VirtualHeight { get; private set; }
+
+    /// <summary>
+    /// Creates a new Resolution instance.
+    /// </summary>
+    /// <param name="graphicsDevice">The graphics device to use for rendering.</param>
+    /// <param name="virtualWidth">The virtual resolution width.</param>
+    /// <param name="virtualHeight">The virtual resolution height.</param>
+    public Resolution(GraphicsDevice graphicsDevice, int virtualWidth, int virtualHeight)
     {
-        _Width = device.PreferredBackBufferWidth;
-        _Height = device.PreferredBackBufferHeight;
-        _Device = device;
-        _dirtyMatrix = true;
-        ApplyResolutionSettings();
-    }
+        _graphicsDevice = graphicsDevice;
+        VirtualWidth = virtualWidth;
+        VirtualHeight = virtualHeight;
 
+        // Create the render target at virtual resolution
+        _renderTarget = new RenderTarget2D(_graphicsDevice, VirtualWidth, VirtualHeight);
 
-    static public Matrix getTransformationMatrix()
-    {
-        if (_dirtyMatrix) RecreateScaleMatrix();
-
-        return _ScaleMatrix;
-    }
-
-    static public void SetResolution(int Width, int Height, bool FullScreen)
-    {
-        _Width = Width;
-        _Height = Height;
-
-        _FullScreen = FullScreen;
-
-        ApplyResolutionSettings();
-    }
-
-    static public void SetVirtualResolution(int Width, int Height)
-    {
-        _VWidth = Width;
-        _VHeight = Height;
-
-        _dirtyMatrix = true;
-    }
-
-    static private void ApplyResolutionSettings()
-    {
-
-#if XBOX360
-           _FullScreen = true;
-#endif
-
-        // If we aren't using a full screen mode, the height and width of the window can
-        // be set to anything equal to or smaller than the actual screen size.
-        if (_FullScreen == false)
-        {
-            if ((_Width <= GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width)
-                && (_Height <= GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height))
-            {
-                _Device.PreferredBackBufferWidth = _Width;
-                _Device.PreferredBackBufferHeight = _Height;
-                _Device.IsFullScreen = _FullScreen;
-                _Device.ApplyChanges();
-            }
-        }
-        else
-        {
-            // If we are using full screen mode, we should check to make sure that the display
-            // adapter can handle the video mode we are trying to set.  To do this, we will
-            // iterate through the display modes supported by the adapter and check them against
-            // the mode we want to set.
-            foreach (DisplayMode dm in GraphicsAdapter.DefaultAdapter.SupportedDisplayModes)
-            {
-                // Check the width and height of each mode against the passed values
-                if ((dm.Width == _Width) && (dm.Height == _Height))
-                {
-                    // The mode is supported, so set the buffer formats, apply changes and return
-                    _Device.PreferredBackBufferWidth = _Width;
-                    _Device.PreferredBackBufferHeight = _Height;
-                    _Device.IsFullScreen = _FullScreen;
-                    _Device.ApplyChanges();
-                }
-            }
-        }
-
-        _dirtyMatrix = true;
-
-        _Width = _Device.PreferredBackBufferWidth;
-        _Height = _Device.PreferredBackBufferHeight;
+        // Calculate initial destination rectangle
+        CalculateDestinationRectangle();
     }
 
     /// <summary>
-    /// Sets the device to use the draw pump
-    /// Sets correct aspect ratio
+    /// Recalculates the destination rectangle for scaling.
+    /// Call this when the window/screen size changes.
     /// </summary>
-    static public void BeginDraw()
+    public void CalculateDestinationRectangle()
     {
-        // Start by reseting viewport to (0,0,1,1)
-        FullViewport();
-        // Clear to Black
-        _Device.GraphicsDevice.Clear(Color.Black);
-        // Calculate Proper Viewport according to Aspect Ratio
-        ResetViewport();
-        // and clear that
-        // This way we are gonna have black bars if aspect ratio requires it and
-        // the clear color on the rest
-        _Device.GraphicsDevice.Clear(Color.CornflowerBlue);
+        float targetAspectRatio = (float)VirtualWidth / VirtualHeight;
+        int width = _graphicsDevice.PresentationParameters.BackBufferWidth;
+        int height = (int)(width / targetAspectRatio);
 
-        var vp = _Device.GraphicsDevice.Viewport;
-        Console.WriteLine($"Viewport: X={vp.X}, Y={vp.Y}, W={vp.Width}, H={vp.Height}, BackBuffer: {_Device.PreferredBackBufferWidth}x{_Device.PreferredBackBufferHeight}, Virtual: {_VWidth}x{_VHeight}");
-    }
+        if (height > _graphicsDevice.PresentationParameters.BackBufferHeight)
+        {
+            height = _graphicsDevice.PresentationParameters.BackBufferHeight;
+            width = (int)(height * targetAspectRatio);
+        }
 
-    static private void RecreateScaleMatrix()
-    {
-        _dirtyMatrix = false;
-        _ScaleMatrix = Matrix.CreateScale(
-                       (float)_Device.GraphicsDevice.Viewport.Width / _VWidth,
-                       (float)_Device.GraphicsDevice.Viewport.Height / _VHeight,
-                       1f);
-    }
+        int x = (_graphicsDevice.PresentationParameters.BackBufferWidth - width) / 2;
+        int y = (_graphicsDevice.PresentationParameters.BackBufferHeight - height) / 2;
 
-
-    static public void FullViewport()
-    {
-        Viewport vp = new Viewport();
-        vp.X = vp.Y = 0;
-        vp.Width = _Width;
-        vp.Height = _Height;
-        _Device.GraphicsDevice.Viewport = vp;
+        _destinationRectangle = new Rectangle(x, y, width, height);
     }
 
     /// <summary>
-    /// Get virtual Mode Aspect Ratio
+    /// Begins rendering to the virtual resolution render target.
     /// </summary>
-    /// <returns>aspect ratio</returns>
-    static public float getVirtualAspectRatio()
+    public void BeginDraw()
     {
-        return (float)_VWidth / (float)_VHeight;
+        _graphicsDevice.SetRenderTarget(_renderTarget);
+        _graphicsDevice.Clear(Color.Black);
     }
 
-    static public void ResetViewport()
+    /// <summary>
+    /// Ends rendering to the virtual resolution and draws the scaled result to the screen.
+    /// </summary>
+    /// <param name="spriteBatch">The sprite batch to use for drawing.</param>
+    public void EndDraw(SpriteBatch spriteBatch)
     {
-        float targetAspectRatio = getVirtualAspectRatio();
-        // figure out the largest area that fits in this resolution at the desired aspect ratio
-        int width = _Device.PreferredBackBufferWidth;
-        int height = (int)(width / targetAspectRatio + .5f);
-        bool changed = false;
+        // Reset render target to back buffer
+        _graphicsDevice.SetRenderTarget(null);
+        _graphicsDevice.Clear(Color.Black);
 
-        if (height > _Device.PreferredBackBufferHeight)
-        {
-            height = _Device.PreferredBackBufferHeight;
-            // PillarBox
-            width = (int)(height * targetAspectRatio + .5f);
-            changed = true;
-        }
-
-        // set up the new viewport centered in the backbuffer
-        Viewport viewport = new Viewport();
-
-        viewport.X = (_Device.PreferredBackBufferWidth / 2) - (width / 2);
-        viewport.Y = (_Device.PreferredBackBufferHeight / 2) - (height / 2);
-        viewport.Width = width;
-        viewport.Height = height;
-        viewport.MinDepth = 0;
-        viewport.MaxDepth = 1;
-
-        if (changed)
-        {
-            _dirtyMatrix = true;
-        }
-
-        _Device.GraphicsDevice.Viewport = viewport;
+        // Draw the render target scaled to fit the screen
+        spriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        spriteBatch.Draw(_renderTarget, _destinationRectangle, Color.White);
+        spriteBatch.End();
     }
-
 }
