@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGameLibrary.Audio;
+using MonoGameLibrary.Graphics;
 using MonoGameLibrary.Input;
 using MonoGameLibrary.Scenes;
 
@@ -38,6 +39,26 @@ public class Core : Game
     /// Gets the sprite batch used for all 2D rendering.
     /// </summary>
     public static SpriteBatch SpriteBatch { get; private set; }
+
+    /// <summary>
+    /// Gets the render target used for virtual resolution rendering.
+    /// </summary>
+    private static RenderTarget2D s_renderTarget;
+
+    /// <summary>
+    /// Gets the virtual resolution width.
+    /// </summary>
+    private static int s_virtualWidth;
+
+    /// <summary>
+    /// Gets the virtual resolution height.
+    /// </summary>
+    private static int s_virtualHeight;
+
+    /// <summary>
+    /// Gets the destination rectangle for drawing the render target to screen.
+    /// </summary>
+    private static Rectangle s_destinationRectangle;
 
     /// <summary>
     /// Gets the content manager used to load global assets.
@@ -77,15 +98,26 @@ public class Core : Game
         // Store reference to engine for global member access.
         s_instance = this;
 
+        // Store virtual resolution
+        s_virtualWidth = width;
+        s_virtualHeight = height;
+
         // Create a new graphics device manager.
         Graphics = new GraphicsDeviceManager(this);
 
-        // Set the graphics defaults
-        Graphics.PreferredBackBufferWidth = width;
-        Graphics.PreferredBackBufferHeight = height;
+        // Set the back buffer dimensions
+        if (fullScreen)
+        {
+            // In fullscreen, use the native monitor resolution
+            Graphics.PreferredBackBufferWidth = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Width;
+            Graphics.PreferredBackBufferHeight = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode.Height;
+        }
+        else
+        {
+            Graphics.PreferredBackBufferWidth = width;
+            Graphics.PreferredBackBufferHeight = height;
+        }
         Graphics.IsFullScreen = fullScreen;
-
-        // Apply the graphic presentation changes.
         Graphics.ApplyChanges();
 
         // Set the window title
@@ -113,6 +145,15 @@ public class Core : Game
         // graphics device.
         GraphicsDevice = base.GraphicsDevice;
 
+        // Create the render target at virtual resolution
+        s_renderTarget = new RenderTarget2D(GraphicsDevice, s_virtualWidth, s_virtualHeight);
+
+        // Calculate destination rectangle for scaling with aspect ratio
+        CalculateDestinationRectangle();
+
+        // Subscribe to window size changes
+        Window.ClientSizeChanged += OnClientSizeChanged;
+
         // Create the sprite batch instance.
         SpriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -121,6 +162,29 @@ public class Core : Game
 
         // Create a new audio controller.
         Audio = new AudioController();
+    }
+
+    private void OnClientSizeChanged(object sender, EventArgs e)
+    {
+        CalculateDestinationRectangle();
+    }
+
+    private static void CalculateDestinationRectangle()
+    {
+        float targetAspectRatio = (float)s_virtualWidth / s_virtualHeight;
+        int width = GraphicsDevice.PresentationParameters.BackBufferWidth;
+        int height = (int)(width / targetAspectRatio);
+
+        if (height > GraphicsDevice.PresentationParameters.BackBufferHeight)
+        {
+            height = GraphicsDevice.PresentationParameters.BackBufferHeight;
+            width = (int)(height * targetAspectRatio);
+        }
+
+        int x = (GraphicsDevice.PresentationParameters.BackBufferWidth - width) / 2;
+        int y = (GraphicsDevice.PresentationParameters.BackBufferHeight - height) / 2;
+
+        s_destinationRectangle = new Rectangle(x, y, width, height);
     }
 
     protected override void UnloadContent()
@@ -162,11 +226,23 @@ public class Core : Game
 
     protected override void Draw(GameTime gameTime)
     {
-        // If there is an active scene, draw it.
+        // Set render target to draw to virtual resolution
+        GraphicsDevice.SetRenderTarget(s_renderTarget);
+        GraphicsDevice.Clear(Color.Black);
+
+        // If there is an active scene, draw it to the render target
         if (s_activeScene != null)
         {
             s_activeScene.Draw(gameTime);
         }
+
+        // Now draw the render target to the back buffer, scaled
+        GraphicsDevice.SetRenderTarget(null);
+        GraphicsDevice.Clear(Color.Black);
+
+        SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
+        SpriteBatch.Draw(s_renderTarget, s_destinationRectangle, Color.White);
+        SpriteBatch.End();
 
         base.Draw(gameTime);
     }

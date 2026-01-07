@@ -51,11 +51,11 @@ public class GameScene : Scene
         // the escape key will be used to return back to the title screen.
         Core.ExitOnEscape = false;
 
-        // Create the room bounds by getting the bounds of the screen then
+        // Create the room bounds using the virtual resolution (1280x720) then
         // using the Inflate method to "Deflate" the bounds by the width and
         // height of a tile so that the bounds only covers the inside room of
         // the dungeon tilemap.
-        _roomBounds = Core.GraphicsDevice.PresentationParameters.Bounds;
+        _roomBounds = new Rectangle(0, 0, 1280, 720);
         _roomBounds.Inflate(-_tilemap.TileWidth, -_tilemap.TileHeight);
 
         // Subscribe to the slime's BodyCollision event so that a game over
@@ -369,9 +369,6 @@ public class GameScene : Scene
 
     public override void Draw(GameTime gameTime)
     {
-        // Clear the back buffer.
-        Core.GraphicsDevice.Clear(Color.CornflowerBlue);
-
         // Begin the sprite batch to prepare for rendering.
         Core.SpriteBatch.Begin(samplerState: SamplerState.PointClamp);
 

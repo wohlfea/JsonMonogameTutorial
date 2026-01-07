@@ -89,8 +89,8 @@ public class TitleScene : Scene
         _backgroundOffsetTwo = new Vector2(_backgroundPattern.Width * 0.75f, _backgroundPattern.Height * 0.75f);
 
         // Set the background pattern destination rectangle to fill the entire
-        // screen background.
-        _backgroundDestination = Core.GraphicsDevice.PresentationParameters.Bounds;
+        // virtual resolution (1280x720).
+        _backgroundDestination = new Rectangle(0, 0, 1280, 720);
 
         InitializeUI();
     }
@@ -310,8 +310,6 @@ public class TitleScene : Scene
 
     public override void Draw(GameTime gameTime)
     {
-        Core.GraphicsDevice.Clear(new Color(32, 40, 78, 255));
-
         // Draw the background pattern first using the PointWrap sampler state.
         Core.SpriteBatch.Begin(samplerState: SamplerState.PointWrap);
         Core.SpriteBatch.Draw(_backgroundPattern, _backgroundDestination, new Rectangle(_backgroundOffsetOne.ToPoint(), _backgroundDestination.Size), Color.White * 0.5f);
