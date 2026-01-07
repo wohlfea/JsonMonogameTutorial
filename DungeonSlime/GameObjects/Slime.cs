@@ -13,8 +13,15 @@ public class Slime
     // movement updates.
     private static readonly TimeSpan s_movementTime = TimeSpan.FromMilliseconds(200);
 
+    // A constant value that represents the time at which food is digested through
+    // each slime segment
+    private static readonly TimeSpan s_digestionTime = TimeSpan.FromMilliseconds(500);
+
     // The amount of time that has elapsed since the last movement update.
     private TimeSpan _movementTimer;
+
+    // The amount of time that has elapsed since the last digestion.
+    private TimeSpan _digestionTimer;
 
     // Normalized value (0-1) representing progress between movement ticks for visual interpolation
     private float _movementProgress;
@@ -28,6 +35,9 @@ public class Slime
 
     // Tracks the segments of the slime chain.
     private List<SlimeSegment> _segments;
+
+    // Tracks the enlarged state of the slime segments;
+    private List<bool> _digestionTract;
 
     // The AnimatedSprite used when drawing each slime segment
     private AnimatedSprite _sprite;
@@ -62,6 +72,7 @@ public class Slime
     {
         // Initialize the segment collection.
         _segments = new List<SlimeSegment>();
+        _digestionTract = new List<bool>();
 
         // Set the stride
         _stride = stride;
@@ -74,6 +85,7 @@ public class Slime
 
         // Add it to the segment collection.
         _segments.Add(head);
+        _digestionTract.Add(false);
 
         // Set the initial next direction as the same direction the head is
         // moving.
@@ -173,9 +185,18 @@ public class Slime
     }
 
     /// <summary>
+    /// Informs the slime that a bat has been consumed.
+    /// </summary>
+    public void Eat()
+    {
+        _digestionTract[0] = true;
+    }
+
+
+    /// <summary>
     /// Informs the slime to grow by one segment.
     /// </summary>
-    public void Grow()
+    private void Grow()
     {
         // Capture the value of the tail segment
         SlimeSegment tail = _segments[_segments.Count - 1];
@@ -189,6 +210,7 @@ public class Slime
 
         // Add the new tail segment
         _segments.Add(newTail);
+        _digestionTract.Add(false);
     }
 
     /// <summary>
@@ -214,8 +236,40 @@ public class Slime
             Move();
         }
 
+        updateDigestiveTract(gameTime);
+
+
         // Update the movement lerp offset amount
         _movementProgress = (float)(_movementTimer.TotalSeconds / s_movementTime.TotalSeconds);
+    }
+
+    private void updateDigestiveTract(GameTime gameTime)
+    {
+        _digestionTimer += gameTime.ElapsedGameTime;
+        if (_digestionTimer >= s_digestionTime)
+        {
+            _digestionTimer -= s_digestionTime;
+            bool enlargeNextSegment = false;
+            for (int i = 0; i < _digestionTract.Count; i++)
+            {
+                if (enlargeNextSegment)
+                {
+                    _digestionTract[i] = true;
+                    enlargeNextSegment = false;
+                    continue;
+                }
+                if (i == _digestionTract.Count - 1 && _digestionTract[i])
+                {
+                    Grow();
+                    _digestionTract[i] = false;
+                }
+                else if (_digestionTract[i])
+                {
+                    enlargeNextSegment = true;
+                    _digestionTract[i] = false;
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -224,8 +278,9 @@ public class Slime
     public void Draw()
     {
         // Iterate through each segment and draw it
-        foreach (SlimeSegment segment in _segments)
+        for (int i = 0; i < _segments.Count; i++)
         {
+            SlimeSegment segment = _segments[i];
             // Calculate the visual position of the segment at the moment by
             // lerping between its "at" and "to" position by the movement
             // offset lerp amount
@@ -233,7 +288,14 @@ public class Slime
 
             // Draw the slime sprite at the calculated visual position of this
             // segment
-            _sprite.Draw(Core.SpriteBatch, pos);
+            if (_digestionTract[i])
+            {
+                _sprite.Draw(Core.SpriteBatch, pos, 5.0f);
+            }
+            else
+            {
+                _sprite.Draw(Core.SpriteBatch, pos);
+            }
         }
     }
 

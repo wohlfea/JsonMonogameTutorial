@@ -209,7 +209,7 @@ public class GameScene : Scene
             _bat.RandomizeVelocity();
 
             // Tell the slime to grow.
-            _slime.Grow();
+            _slime.Eat();
 
             // Increment the score.
             _score += 100;

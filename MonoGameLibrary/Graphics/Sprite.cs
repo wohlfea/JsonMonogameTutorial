@@ -101,6 +101,17 @@ public class Sprite
     /// </summary>
     /// <param name="spriteBatch">The SpriteBatch instance used for batching draw calls.</param>
     /// <param name="position">The xy-coordinate position to render this sprite at.</param>
+    /// <param name="scale">The scale of the sprite</param>
+    public void Draw(SpriteBatch spriteBatch, Vector2 position, float scale)
+    {
+        Region.Draw(spriteBatch, position, Color, Rotation, Origin, scale, Effects, LayerDepth);
+    }
+
+    /// <summary>
+    /// Submit this sprite for drawing to the current batch.
+    /// </summary>
+    /// <param name="spriteBatch">The SpriteBatch instance used for batching draw calls.</param>
+    /// <param name="position">The xy-coordinate position to render this sprite at.</param>
     public void Draw(SpriteBatch spriteBatch, Vector2 position)
     {
         Region.Draw(spriteBatch, position, Color, Rotation, Origin, Scale, Effects, LayerDepth);
