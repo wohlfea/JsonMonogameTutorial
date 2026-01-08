@@ -33,6 +33,7 @@ Installers/Linux/tmp_run/
 *.sbr
 *.sdf
 *.csproj.csdat
+*.tar.gz
 ipch/
 obj/
 [Bb]in
